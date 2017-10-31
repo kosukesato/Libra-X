@@ -194,6 +194,12 @@ def set_defaults(params, interface, recipe=""):
     # Options: None - not to use
     params["therm"] = None
 
+    # a list for shifting excitation energies
+    params["shift_E"] = []
+
+    # a list for setting excited states inactive in NA-MD
+    params["inactive_states"] = []
+
     ##### Optional MM interactions on top of the QM #####
 
     # The flag controlling whether to include MM interactions

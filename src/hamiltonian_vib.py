@@ -305,7 +305,7 @@ def update_vibronic_hamiltonian(ham_el, ham_vib, params,E_SD,nac,suffix, opt):
                     print "\n"
       
 
-    if "inactive_states" in params:
+    if len(params["inactive_states"]) > 0:
         for ist in params["inactive_states"]:
             for jst in xrange(nstates):
                 if ist!=jst:

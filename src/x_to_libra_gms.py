@@ -173,7 +173,7 @@ def gamess_to_libra(params, ao, E, sd_basis, active_space,suff):
     nac = 0.50/params["dt_nucl"] * ( P12 - P21 )
 
     # shift exciting energies according to "shift_E" list.
-    if "shift_E" in params:
+    if len(params["shift_E"]) >0:
         eV_to_au = 0.036749
         #print "before shifting E(0,0) is %f " % E_ave.get(0,0)
         for i in xrange(nstates):
