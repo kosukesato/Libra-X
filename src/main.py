@@ -325,7 +325,8 @@ def main(params):
     el = []
 
     Ttemp = 0.0
-    if params["MD_type"] == 1: # start NA-MD interacting with thermostat @ t=0
+    if params["Ncool"] < 0: # initialize velocities @ t=0 if thermalization or NA-MD are executed.
+                            # In NA-MD, this initialization doesn't depend on whether the thermostat is coupled or not.
         Ttemp = params["Temperature"]
 
     # create system object
