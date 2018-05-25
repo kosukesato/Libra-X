@@ -226,20 +226,27 @@ def main(params):
             nel = params["nel"]
             occ, occ_alp, occ_bet = excitation_to_qe_occ(params, excitation)
             status = -1
-
+            restart_flag = 0
+            coount = 0
             while status != 0: #for i in xrange(5):
-                write_qe_input_first("x%i.scf_wrk.in"%ex_st,occ,occ_alp,occ_bet,nspin)
+                coount = coount + 1
+                write_qe_input_first("x%i.scf_wrk.in"%ex_st,occ,occ_alp,occ_bet,nspin,params,restart_flag)
                 exe_espresso(ex_st)
                 status = check_convergence("x%i.scf.out" % ex_st) # returns 0 if SCF converges, 1 if not converges
                 if status == 0:
                     tot_ene, label, R, grads, mo_pool_alp, mo_pool_bet, params["norb"], params["nel"], params["nat"], params["alat"] = qe_extract("x%i.scf.out" % ex_st, active_space, ex_st, nspin, flag)
 
                 else:
+                    if coount==1:
+                        restart_flag = 10
+                    else:
+                        restart_flag = 11
+
                     if params["nspin"] == 2:
                         en_alp = qe_extract_eigenvalues("x%i.save/K00001/eigenval1.xml"%ex_st,nel)
                         en_bet = qe_extract_eigenvalues("x%i.save/K00001/eigenval2.xml"%ex_st,nel)
-                        occ_alp = fermi_pop(en_alp,nel,params["nspin"],params["electronic_smearing"])
-                        occ_bet = fermi_pop(en_bet,nel,params["nspin"],params["electronic_smearing"])
+                        occ_alp = fermi_pop(en_alp,nel,params["nspin"],params["electronic_smearing"],ex_st)
+                        occ_bet = fermi_pop(en_bet,nel,params["nspin"],params["electronic_smearing"],0)
 
                     elif params["nspin"] == 1:
                         en_orb = qe_extract_eigenvalues("x%i.save/K00001/eigenval.xml"%ex_st,nel)
@@ -339,7 +346,10 @@ def main(params):
                 df = 0 # debug flag
                 # Here we use libra_py module!
                 # Utilize the gradients on the ground (0) excited state
-                x = init_system.init_system(label_list[i], R_list[i], grad_list[i][0], rnd, Ttemp, params["sigma_pos"], df, "elements.txt")
+                if params["interface"]=="QE": # For Delta-SCF-NAMD, initialize with excited state (i_ex) gradients.
+                    x = init_system.init_system(label_list[i], R_list[i], grad_list[i][i_ex], rnd, Ttemp, params["sigma_pos"], df, "elements.txt")
+                else:
+                    x = init_system.init_system(label_list[i], R_list[i], grad_list[i][0], rnd, Ttemp, params["sigma_pos"], df, "elements.txt")
 
                 # Add the connectivity - needed if we plan to use MM
                 if params["is_MM"]:
