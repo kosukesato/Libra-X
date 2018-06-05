@@ -69,6 +69,8 @@ def init_files(params):
             fel = open(sh_pop_file,"w"); fel.close();
 
             if params["print_aux_results"] == 1:
+                if params["do_rescaling"] == 0:
+                    num_SH_traj = 1
                 for itraj in xrange(num_SH_traj):
                     index = index0+"_"+str(itraj)
                     ene_file = ene_file_prefix+index+".txt"
